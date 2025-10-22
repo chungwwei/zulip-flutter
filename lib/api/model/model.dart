@@ -659,6 +659,8 @@ class ZulipStream {
   bool isWebPublic; // present since 2.1, according to /api/changelog
   bool historyPublicToSubscribers;
   int? messageRetentionDays;
+  @JsonKey(defaultValue: TopicsPolicy.inherit) // TODO(server-11) remove default value
+  TopicsPolicy topicsPolicy;
   @JsonKey(name: 'stream_post_policy')
   ChannelPostPolicy? channelPostPolicy; // TODO(server-10) remove
   // final bool isAnnouncementOnly; // deprecated for `channelPostPolicy`; ignore
@@ -684,6 +686,7 @@ class ZulipStream {
     required this.isWebPublic,
     required this.historyPublicToSubscribers,
     required this.messageRetentionDays,
+    required this.topicsPolicy,
     required this.channelPostPolicy,
     required this.folderId,
     required this.canAddSubscribersGroup,
@@ -708,6 +711,7 @@ class ZulipStream {
       isWebPublic: subscription.isWebPublic,
       historyPublicToSubscribers: subscription.historyPublicToSubscribers,
       messageRetentionDays: subscription.messageRetentionDays,
+      topicsPolicy: subscription.topicsPolicy,
       channelPostPolicy: subscription.channelPostPolicy,
       folderId: subscription.folderId,
       canAddSubscribersGroup: subscription.canAddSubscribersGroup,
@@ -744,6 +748,7 @@ enum ChannelPropertyName {
   // isWebPublic is updated via its own [ChannelUpdateEvent] field
   // historyPublicToSubscribers is updated via its own [ChannelUpdateEvent] field
   messageRetentionDays,
+  topicsPolicy,
   @JsonValue('stream_post_policy')
   channelPostPolicy,
   folderId,
@@ -763,6 +768,24 @@ enum ChannelPropertyName {
   // _$…EnumMap is thanks to `alwaysCreate: true` and `fieldRename: FieldRename.snake`
   static final _byRawString = _$ChannelPropertyNameEnumMap
     .map((key, value) => MapEntry(value, key));
+}
+
+/// A value of [ZulipStream.topicsPolicy].
+///
+/// For docs, search for "topics_policy"
+/// in <https://zulip.com/api/get-stream-by-id>.
+@JsonEnum(fieldRename: FieldRename.snake)
+enum TopicsPolicy {
+  inherit,
+  allowEmptyTopic,
+  disableEmptyTopic,
+  emptyTopicOnly;
+
+  static TopicsPolicy fromApiValue(String apiValue) => _byApiValue[apiValue] ?? inherit;
+
+  static final _byApiValue = _$TopicsPolicyEnumMap.map((key, value) => MapEntry(value, key));
+
+  String toJson() => _$TopicsPolicyEnumMap[this]!;
 }
 
 /// Policy for which users can post to the stream.
@@ -830,6 +853,7 @@ class Subscription extends ZulipStream {
     required super.isWebPublic,
     required super.historyPublicToSubscribers,
     required super.messageRetentionDays,
+    required super.topicsPolicy,
     required super.channelPostPolicy,
     required super.folderId,
     required super.canAddSubscribersGroup,
