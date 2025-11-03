@@ -90,6 +90,8 @@ class InitialSnapshot {
   /// Search for "realm_wildcard_mention_policy" in https://zulip.com/api/register-queue.
   final RealmWildcardMentionPolicy realmWildcardMentionPolicy;
 
+  final RealmTopicsPolicy realmTopicsPolicy;
+
   final bool realmMandatoryTopics;
 
   final String realmName;
@@ -183,6 +185,7 @@ class InitialSnapshot {
     required this.realmCanDeleteOwnMessageGroup,
     required this.realmDeleteOwnMessagePolicy,
     required this.realmWildcardMentionPolicy,
+    required this.realmTopicsPolicy,
     required this.realmMandatoryTopics,
     required this.realmName,
     required this.realmWaitingPeriodThreshold,
@@ -205,6 +208,22 @@ class InitialSnapshot {
     _$InitialSnapshotFromJson(json);
 
   Map<String, dynamic> toJson() => _$InitialSnapshotToJson(this);
+}
+
+/// A value of [InitialSnapshot.realmTopicsPolicy].
+///
+/// For docs, search for "realm_topics_policy"
+/// in <https://zulip.com/api/register-queue#response>.
+@JsonEnum(fieldRename: FieldRename.snake)
+enum RealmTopicsPolicy {
+  allowEmptyTopic,
+  disableEmptyTopic;
+
+  static RealmTopicsPolicy fromApiValue(String apiValue)=> _byApiValue[apiValue] ?? allowEmptyTopic;
+
+  static final _byApiValue = _$RealmTopicsPolicyEnumMap.map((key, value) => MapEntry(value, key));
+
+  String toJson() => _$RealmTopicsPolicyEnumMap[this]!;
 }
 
 @JsonEnum(valueField: 'apiValue')
