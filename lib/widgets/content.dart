@@ -21,6 +21,7 @@ import 'katex.dart';
 import 'lightbox.dart';
 import 'message_list.dart';
 import 'poll.dart';
+import 'profile.dart';
 import 'scrolling.dart';
 import 'store.dart';
 import 'text.dart';
@@ -1182,7 +1183,7 @@ class _InlineContentBuilder {
 
 const kInlineCodeFontSizeFactor = 0.825;
 
-class UserMention extends StatelessWidget {
+class UserMention extends StatefulWidget {
   const UserMention({
     super.key,
     required this.ambientTextStyle,
@@ -1193,14 +1194,30 @@ class UserMention extends StatelessWidget {
   final UserMentionNode node;
 
   @override
+  State<UserMention> createState() => _UserMentionState();
+}
+
+class _UserMentionState extends State<UserMention> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final store = PerAccountStoreWidget.of(context);
     final contentTheme = ContentTheme.of(context);
-    var nodes = node.nodes;
-    if (node.userId case final userId?) {
+    var nodes = widget.node.nodes;
+    if (widget.node.userId case final userId?) {
       final user = store.getUser(userId);
       if (user case User(:final fullName)) {
-        nodes = [TextNode(node.isSilent ? fullName : '@$fullName')];
+        nodes = [TextNode(widget.node.isSilent ? fullName : '@$fullName')];
       }
     }
     return Container(
@@ -1219,7 +1236,7 @@ class UserMention extends StatelessWidget {
         // TODO(#647) when self-user is non-silently mentioned, make bold, and:
         // TODO(#646) when self-user is non-silently mentioned,
         //   distinguish font color between direct and wildcard mentions
-        style: ambientTextStyle,
+        style: widget.ambientTextStyle,
 
         nodes: nodes));
   }
