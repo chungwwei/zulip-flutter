@@ -1198,14 +1198,22 @@ class UserMention extends StatefulWidget {
 }
 
 class _UserMentionState extends State<UserMention> {
+  late GestureRecognizer? _recognizer;
 
   @override
   void initState() {
     super.initState();
+    _recognizer = switch (widget.node.userId) {
+      null => null,
+      final userId => TapGestureRecognizer()
+        ..onTap = () => Navigator.push(context,
+          ProfilePage.buildRoute(context: context, userId: userId)),
+    };
   }
 
   @override
   void dispose() {
+    _recognizer?.dispose();
     super.dispose();
   }
 
@@ -1228,7 +1236,7 @@ class _UserMentionState extends State<UserMention> {
       padding: const EdgeInsets.symmetric(horizontal: 0.2 * kBaseFontSize),
       child: InlineContent(
         // If an @-mention is inside a link, let the @-mention override it.
-        recognizer: null,  // TODO(#1867) make @-mentions tappable, for info on user
+        recognizer: _recognizer,
         // One hopes an @-mention can't contain an embedded link.
         // (The parser on creating a UserMentionNode has a TODO to check that.)
         linkRecognizers: null,
